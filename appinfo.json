@@ -28,6 +28,11 @@
                 "file": "fonts/UbuntuMono-Regular.ttf",
                 "name": "MONO_FONT_14",
                 "type": "font"
+            },
+            {
+                "file": "images/deadpool_icon_picmonkeyed.png",
+                "name": "IMAGES_DEADPOOL_ICON_PICMONKEYED_PNG",
+                "type": "png"
             }
         ]
     },
