@@ -1,0 +1,33 @@
+/* CSS file placeholder. */
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  display: block;
+  height: 100%;
+  width: 100%;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  color: #fff;
+  text-align: center;
+  font-size: 2em;
+}
+
+.container {
+  overflow: visible;
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: url(assets/deadpool_fire.jpg) 0 70%;
+}
+
+.inner-container {
+  display: block;
+  height: 100%;
+  width: 100%;
+  padding: 15px;
+  margin: 0;
+  background-color: rgba(255, 255, 255, 0.25);
+}
