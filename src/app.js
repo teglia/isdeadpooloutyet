@@ -1,48 +1,72 @@
 /**
- * Welcome to Pebble.js!
+ * Little app to let you know if the Deadpool movie is out yet!
  *
- * This is where you write your app.
  */
 
+/** Pebble API stuff **/
 var UI = require('ui');
-var Vector2 = require('vector2');
+var Accel = require('ui/accel'); Accel.init();
+var ajax = require('ajax');
 
-var formatShortDate = function(d) {
-  var monthNames = [
-    "January", "February", "March",
-    "April", "May", "June", "July",
-    "August", "September", "October",
-    "November", "December"
-  ];
-  var dd = d.getDate();
-  var mm = monthNames[d.getMonth()];
-  var yy = d.getFullYear();
-
-  return mm + ' ' + dd + ', '+yy;
-};
-
-var deadpoolDate = new Date(2016, 1, 12);
-var todaysDate = new Date();
+/** The rest **/
+var deadpoolDate = new Date(2016, 1, 12); // Just in case we can't get the release date from moviedb.
 var isItOutYetSub = '';
 var isItOutYetBody = '';
+var url = 'http://api.themoviedb.org/3/movie/',
+    movie = '293660',
+    mode = '?',
+    key = 'api_key=';
 
-var options = {
-  weekday: "long", year: "numeric", month: "short",
-  day: "numeric", hour: "2-digit", minute: "2-digit"
+ajax({
+  type: 'json',
+  url: url + movie + mode + key,
+  },
+  function(data, status, request) {
+    console.log("Got fresh relese date from themoviedb.org: " + data.release_date);
+    deadpoolDate = new Date(data.release_date);
+  },
+  function(error, status, request) {
+    console.log("AJAX error while attempting to get release date from themoviedb.org: " + error);
+  }
+);
+
+var getSeconds = function() {
+  var now = new Date();
+  return Math.round((deadpoolDate - now) / 1000);
 };
 
-if (todaysDate >= deadpoolDate) {
+var showDetailsCard = function() {
+  var detailsCard = new UI.Card();
+  detailsCard.show();
+
+  var secondTicker = setInterval(function() {
+    if (getSeconds() <= 0) {
+      clearInterval(secondTicker);
+      detailsCard.title("Done Waitin'!");
+      detailsCard.subtitle('Go to the movie,');
+      detailsCard.body("but don't run into any walls, especially that 4th one.");
+    }
+    else {
+      detailsCard.title("There's Only");
+      detailsCard.subtitle(getSeconds());
+      detailsCard.body("seconds (that's " + Math.round(getSeconds() / 86400) + " days) until it is out. Don't worry, you will make it!");
+      detailsCard.subtitle(getSeconds());      
+    }
+  }, 1000);
+};
+
+if (getSeconds() <= 0) {
   isItOutYetSub = 'YES YES YES!';
-  isItOutYetBody = 'Time to touch yourse... go see a movie!';
+  isItOutYetBody = 'Time to touch... go see a movie!';
 }
 else {
   isItOutYetSub = 'No.';
-  isItOutYetBody = "Counting seconds? Click a button!";
+  isItOutYetBody = "Counting seconds? Shake it!";
 }
-
 
 var main = new UI.Card({
   title: 'Is Deadpool Out Yet?',
+  icon: 'images/deadpool_icon_22.png',
   subtitle: isItOutYetSub,
   body: isItOutYetBody
 });
@@ -50,20 +74,9 @@ var main = new UI.Card({
 main.show();
 
 main.on('click', 'select', function(e) {
-  var card = new UI.Card();
-  var secondsLeft = Math.round((deadpoolDate - todaysDate) / 1000);
+  showDetailsCard();
+});
 
-  card.title("There's Only");
-  card.subtitle(secondsLeft);
-  card.body("Seconds (that's " + Math.round(secondsLeft / 86400) + " days) until it is out. Don't worry, you will make it!");
-  card.show();
-  todaysDate = new Date();
-  var interval = setInterval(function() {
-
-    if (todaysDate <= deadpoolDate) {
-      todaysDate = new Date();
-      var timeleft = Math.round((deadpoolDate - todaysDate) / 1000 ); 
-      card.subtitle(timeleft);
-    }
-  }, 1000);
+main.on('accelTap', function(e) {
+  showDetailsCard();
 });
